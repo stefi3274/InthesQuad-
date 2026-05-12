@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InTheSquad</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #FFD700;
+    --dark: #080c14;
+    --card: #0f1623;
+    --border: rgba(255,215,0,0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    min-height: 100vh;
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 30px 20px 10px;
+    position: relative;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    letter-spacing: 6px;
+    background: linear-gradient(135deg, #FFD700, #fff, #FFD700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+    line-height: 1;
+  }
+
+  .tagline {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* STEPS */
+  .steps {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 20px 20px 0;
+  }
+
+  .step {
+    flex: 1;
+    max-width: 100px;
+    text-align: center;
+    opacity: 0.3;
+    transition: opacity 0.3s;
+  }
+
+  .step.active { opacity: 1; }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 1px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    color: var(--gold);
+    margin: 0 auto 4px;
+  }
+
+  .step.active .step-num {
+    background: var(--gold);
+    color: #000;
+  }
+
+  .step-label {
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .step-line {
+    width: 20px;
+    height: 1px;
+    background: var(--border);
+    align-self: center;
+    margin-bottom: 18px;
+  }
+
+  /* MAIN CONTENT */
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .panel {
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .panel.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* UPLOAD ZONE */
+  .upload-zone {
+    border: 2px dashed rgba(255,215,0,0.3);
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: var(--card);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .upload-zone:hover {
+    border-color: var(--gold);
+    background: rgba(255,215,0,0.05);
+  }
+
+  .upload-zone input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .upload-icon { font-size: 48px; margin-bottom: 12px; }
+
+  .upload-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .upload-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+  }
+
+  .preview-img {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+    border: 3px solid var(--gold);
+    margin: 0 auto 12px;
+    display: block;
+  }
+
+  /* TEAM GRID */
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .team-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .team-btn:hover, .team-btn.selected {
+    border-color: var(--gold);
+    background: rgba(255,215,0,0.08);
+    transform: scale(1.03);
+  }
+
+  .team-flag { font-size: 28px; display: block; margin-bottom: 4px; }
+
+  .team-name {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+  }
+
+  /* SCENE GRID */
+  .scene-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .scene-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .scene-btn:hover, .scene-btn.selected {
+    border-color: var(--gold);
+    background: rgba(255,215,0,0.08);
+  }
+
+  .scene-icon { font-size: 32px; display: block; margin-bottom: 6px; }
+
+  .scene-name {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+  }
+
+  /* NAME INPUT */
+  .name-input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: #fff;
+    text-align: center;
+    outline: none;
+    margin-bottom: 20px;
+    transition: border-color 0.3s;
+  }
+
+  .name-input:focus { border-color: var(--gold); }
+  .name-input::placeholder { color: rgba(255,255,255,0.2); }
+
+  /* BUTTON */
+  .btn-main {
+    width: 100%;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: #000;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+  }
+
+  .btn-main:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,215,0,0.3); }
+  .btn-main:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-secondary {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 13px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+
+  /* LOADING */
+  .loading-panel {
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .loader {
+    width: 60px;
+    height: 60px;
+    border: 3px solid rgba(255,215,0,0.1);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .loading-sub {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+  }
+
+  .loading-steps {
+    margin-top: 24px;
+    text-align: left;
+  }
+
+  .loading-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 13px;
+    color: rgba(255,255,255,0.3);
+    transition: color 0.5s;
+  }
+
+  .loading-step.done { color: rgba(255,255,255,0.8); }
+  .loading-step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    flex-shrink: 0;
+    transition: background 0.5s;
+  }
+  .loading-step.done .loading-step-dot { background: var(--gold); }
+
+  /* RESULT */
+  .result-panel { text-align: center; }
+
+  .result-image-wrap {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 40px rgba(255,215,0,0.2);
+  }
+
+  .result-image-wrap img {
+    width: 100%;
+    display: block;
+  }
+
+  .result-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    padding: 20px 16px 12px;
+    text-align: left;
+  }
+
+  .result-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: #fff;
+  }
+
+  .result-team {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+  }
+
+  .result-watermark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.3);
+  }
+
+  .share-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .btn-share {
+    padding: 13px;
+    border-radius: 10px;
+    border: none;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .btn-download {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #000;
+  }
+
+  .btn-tiktok {
+    background: #010101;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .error-box {
+    background: rgba(255,50,50,0.1);
+    border: 1px solid rgba(255,50,50,0.3);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 13px;
+    color: rgba(255,150,150,0.9);
+    margin-bottom: 16px;
+    text-align: left;
+  }
+
+  /* FALLBACK CARD (si API échoue) */
+  .fallback-card {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 3/4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">InTheSquad</div>
+  <div class="tagline">Rejoins ta sélection nationale</div>
+</header>
+
+<!-- STEPS INDICATOR -->
+<div class="steps" id="stepsBar">
+  <div class="step active" id="s1"><div class="step-num">1</div><div class="step-label">Photo</div></div>
+  <div class="step-line"></div>
+  <div class="step" id="s2"><div class="step-num">2</div><div class="step-label">Équipe</div></div>
+  <div class="step-line"></div>
+  <div class="step" id="s3"><div class="step-num">3</div><div class="step-label">Scène</div></div>
+  <div class="step-line"></div>
+  <div class="step" id="s4"><div class="step-num">4</div><div class="step-label">Résultat</div></div>
+</div>
+
+<div class="container">
+
+  <!-- PANEL 1: UPLOAD PHOTO -->
+  <div class="panel active" id="panel1">
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" accept="image/*" id="photoInput">
+      <div id="uploadContent">
+        <div class="upload-icon">📸</div>
+        <div class="upload-title">Uploade ta photo</div>
+        <div class="upload-sub">Selfie ou portrait · JPG, PNG</div>
+      </div>
+    </div>
+    <br>
+    <input type="text" class="name-input" id="playerName" placeholder="TON NOM" maxlength="20">
+    <button class="btn-main" id="btn1" onclick="goToStep2()" disabled>Choisir mon équipe →</button>
+  </div>
+
+  <!-- PANEL 2: CHOISIR ÉQUIPE -->
+  <div class="panel" id="panel2">
+    <div class="section-title">Quelle sélection ?</div>
+    <div class="team-grid" id="teamGrid">
+      <div class="team-btn" onclick="selectTeam(this, 'Haïti', '🇭🇹', '#00209F', '#D21034')">
+        <span class="team-flag">🇭🇹</span>
+        <span class="team-name">Haïti</span>
+      </div>
+      <div class="team-btn" onclick="selectTeam(this, 'Brésil', '🇧🇷', '#009C3B', '#FFDF00')">
+        <span class="team-flag">🇧🇷</span>
+        <span class="team-name">Brésil</span>
+      </div>
+      <div class="team-btn" onclick="selectTeam(this, 'France', '🇫🇷', '#002395', '#ED2939')">
+        <span class="team-flag">🇫🇷</span>
+        <span class="team-name">France</span>
+      </div>
+      <div class="team-btn" onclick="selectTeam(this, 'Argentine', '🇦🇷', '#74ACDF', '#fff')">
+        <span class="team-flag">🇦🇷</span>
+        <span class="team-name">Argentine</span>
+      </div>
+      <div class="team-btn" onclick="selectTeam(this, 'Sénégal', '🇸🇳', '#00853F', '#FDEF42')">
+        <span class="team-flag">🇸🇳</span>
+        <span class="team-name">Sénégal</span>
+      </div>
+      <div class="team-btn" onclick="selectTeam(this, 'Portugal', '🇵🇹', '#006600', '#FF0000')">
+        <span class="team-flag">🇵🇹</span>
+        <span class="team-name">Portugal</span>
+      </div>
+      <div class="team-btn" onclick="selectTeam(this, 'Maroc', '🇲🇦', '#C1272D', '#006233')">
+        <span class="team-flag">🇲🇦</span>
+        <span class="team-name">Maroc</span>
+      </div>
+      <div class="team-btn" onclick="selectTeam(this, 'Allemagne', '🇩🇪', '#000000', '#DD0000')">
+        <span class="team-flag">🇩🇪</span>
+        <span class="team-name">Allemagne</span>
+      </div>
+      <div class="team-btn" onclick="selectTeam(this, 'USA', '🇺🇸', '#002868', '#BF0A30')">
+        <span class="team-flag">🇺🇸</span>
+        <span class="team-name">USA</span>
+      </div>
+    </div>
+    <button class="btn-main" id="btn2" onclick="goToStep3()" disabled>Choisir la scène →</button>
+    <button class="btn-secondary" onclick="goBack(1)">← Retour</button>
+  </div>
+
+  <!-- PANEL 3: CHOISIR SCÈNE -->
+  <div class="panel" id="panel3">
+    <div class="section-title">Dans quelle scène ?</div>
+    <div class="scene-grid">
+      <div class="scene-btn" onclick="selectScene(this, 'vestiaire', 'dans le vestiaire avec ses coéquipiers avant le match')">
+        <span class="scene-icon">🏟️</span>
+        <span class="scene-name">Vestiaire</span>
+      </div>
+      <div class="scene-btn" onclick="selectScene(this, 'terrain', 'sur le terrain de football pendant un match du Mondial')">
+        <span class="scene-icon">⚽</span>
+        <span class="scene-name">Sur le terrain</span>
+      </div>
+      <div class="scene-btn" onclick="selectScene(this, 'celebration', 'célébrant un but avec ses coéquipiers, bras levés, stade en liesse')">
+        <span class="scene-icon">🎉</span>
+        <span class="scene-name">Célébration</span>
+      </div>
+      <div class="scene-btn" onclick="selectScene(this, 'photo officielle', 'sur la photo officielle de léquipe nationale, en rang, maillot officiel')">
+        <span class="scene-icon">📷</span>
+        <span class="scene-name">Photo officielle</span>
+      </div>
+    </div>
+    <button class="btn-main" id="btn3" onclick="generate()" disabled>🪄 Générer ma photo</button>
+    <button class="btn-secondary" onclick="goBack(2)">← Retour</button>
+  </div>
+
+  <!-- PANEL LOADING -->
+  <div class="panel" id="panelLoading">
+    <div class="loading-panel">
+      <div class="loader"></div>
+      <div class="loading-title">Génération en cours</div>
+      <div class="loading-sub" id="loadingMsg">Préparation de ta photo...</div>
+      <div class="loading-steps">
+        <div class="loading-step" id="ls1"><div class="loading-step-dot"></div>Analyse de ta photo</div>
+        <div class="loading-step" id="ls2"><div class="loading-step-dot"></div>Application du maillot</div>
+        <div class="loading-step" id="ls3"><div class="loading-step-dot"></div>Intégration dans la scène</div>
+        <div class="loading-step" id="ls4"><div class="loading-step-dot"></div>Finalisation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL 4: RÉSULTAT -->
+  <div class="panel" id="panel4">
+    <div class="result-panel">
+      <div id="errorBox" class="error-box" style="display:none"></div>
+      <div class="result-image-wrap" id="resultWrap">
+        <img id="resultImg" src="" alt="Ta photo InTheSquad">
+        <div class="result-overlay">
+          <div class="result-name" id="resultName"></div>
+          <div class="result-team" id="resultTeam"></div>
+        </div>
+        <div class="result-watermark">InTheSquad</div>
+      </div>
+      <div class="share-btns">
+        <button class="btn-share btn-download" onclick="downloadImage()">⬇ Télécharger</button>
+        <button class="btn-share btn-tiktok" onclick="shareImage()">↗ Partager</button>
+      </div>
+      <button class="btn-secondary" onclick="restart()">🔄 Recommencer</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // State
+  let photoFile = null;
+  let photoBase64 = null;
+  let selectedTeam = null;
+  let selectedTeamColors = null;
+  let selectedScene = null;
+  let playerName = '';
+  let generatedImageUrl = null;
+
+  const BACKEND_URL = 'https://inthes-quad.vercel.app';
+
+  // Upload photo
+  document.getElementById('photoInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    photoFile = file;
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      photoBase64 = ev.target.result;
+      document.getElementById('uploadContent').innerHTML = `
+        <img src="${photoBase64}" class="preview-img" alt="Ta photo">
+        <div class="upload-title" style="font-size:16px">Photo chargée ✓</div>
+        <div class="upload-sub">Clique pour changer</div>
+      `;
+      checkBtn1();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('playerName').addEventListener('input', checkBtn1);
+
+  function checkBtn1() {
+    const name = document.getElementById('playerName').value.trim();
+    document.getElementById('btn1').disabled = !(photoBase64 && name.length > 0);
+  }
+
+  function selectTeam(el, name, flag, color1, color2) {
+    document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedTeam = { name, flag, color1, color2 };
+    document.getElementById('btn2').disabled = false;
+  }
+
+  function selectScene(el, name, description) {
+    document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedScene = { name, description };
+    document.getElementById('btn3').disabled = false;
+  }
+
+  function goToStep2() {
+    playerName = document.getElementById('playerName').value.trim().toUpperCase();
+    showPanel('panel2');
+    setStep(2);
+  }
+
+  function goToStep3() {
+    showPanel('panel3');
+    setStep(3);
+  }
+
+  function goBack(step) {
+    showPanel('panel' + step);
+    setStep(step);
+  }
+
+  function setStep(n) {
+    for (let i = 1; i <= 4; i++) {
+      const s = document.getElementById('s' + i);
+      if (s) s.classList.toggle('active', i <= n);
+    }
+  }
+
+  function showPanel(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  async function generate() {
+    showPanel('panelLoading');
+    setStep(4);
+
+    // Animate loading steps
+    const steps = ['ls1','ls2','ls3','ls4'];
+    const msgs = ['Analyse de ta photo...', 'Application du maillot...', 'Intégration dans la scène...', 'Finalisation...'];
+
+    // Start animation in parallel with API call
+    animateSteps(steps, msgs);
+
+    try {
+      const prompt = `A professional sports photograph of a ${selectedTeam.name} national football team player ${selectedScene.description}. The player wears the official ${selectedTeam.name} national team jersey in colors ${selectedTeam.color1} and ${selectedTeam.color2}. Photorealistic, high quality, stadium lighting, dramatic atmosphere, World Cup 2026. The person's face is clearly visible and realistic.`;
+
+      
+      const response = await fetch(`${BACKEND_URL}/api/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: photoBase64, prompt: prompt })
+      });
+
+      if (!response.ok) throw new Error(`Erreur serveur: ${response.status}`);
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      generatedImageUrl = data.image;
+      showResult(generatedImageUrl);
+
+    } catch (err) {
+      console.error(err);
+      showFallback(err.message);
+    }
+  }
+
+  async function animateSteps(steps, msgs) {
+    for (let i = 0; i < steps.length; i++) {
+      await delay(3000);
+      document.getElementById(steps[i]).classList.add('done');
+      document.getElementById('loadingMsg').textContent = msgs[i];
+    }
+  }
+
+  function showResult(imgUrl) {
+    document.getElementById('resultImg').src = imgUrl;
+    document.getElementById('resultName').textContent = playerName;
+    document.getElementById('resultTeam').textContent = `${selectedTeam.flag} Sélection ${selectedTeam.name} · Mondial 2026`;
+    document.getElementById('errorBox').style.display = 'none';
+    showPanel('panel4');
+  }
+
+  function showFallback(errMsg) {
+    // Create a canvas-based result with their photo
+    const canvas = document.createElement('canvas');
+    canvas.width = 400;
+    canvas.height = 550;
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.onload = function() {
+      // Background gradient with team colors
+      const grad = ctx.createLinearGradient(0, 0, 0, 550);
+      grad.addColorStop(0, selectedTeam.color1 || '#001a8c');
+      grad.addColorStop(1, selectedTeam.color2 || '#8c001a');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 400, 550);
+
+      // Diagonal texture lines
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      ctx.lineWidth = 1;
+      for (let i = -550; i < 400; i += 20) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i + 550, 550);
+        ctx.stroke();
+      }
+
+      // Photo circle
+      const cx = 200, cy = 200, r = 140;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(img, cx - r, cy - r, r * 2, r * 2);
+      ctx.restore();
+
+      // Circle border
+      ctx.strokeStyle = 'rgba(255,215,0,0.8)';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Flag
+      ctx.font = '40px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(selectedTeam.flag, 200, 380);
+
+      // Name
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 36px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(playerName, 200, 430);
+
+      // Team
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = '14px Arial';
+      ctx.fillText(`SÉLECTION ${selectedTeam.name.toUpperCase()} · MONDIAL 2026`, 200, 460);
+
+      // Watermark
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      ctx.font = '12px Arial';
+      ctx.fillText('InTheSquad', 200, 530);
+
+      const dataUrl = canvas.toDataURL('image/png');
+      generatedImageUrl = dataUrl;
+
+      document.getElementById('resultImg').src = dataUrl;
+      document.getElementById('resultName').textContent = playerName;
+      document.getElementById('resultTeam').textContent = `${selectedTeam.flag} Sélection ${selectedTeam.name} · Mondial 2026`;
+      document.getElementById('errorBox').style.display = 'none';
+      showPanel('panel4');
+    };
+
+    img.onerror = function() {
+      document.getElementById('errorBox').style.display = 'block';
+      document.getElementById('errorBox').textContent = 'Erreur lors de la génération. Réessaie avec une autre photo.';
+      showPanel('panel4');
+      document.getElementById('resultWrap').style.display = 'none';
+    };
+
+    img.src = photoBase64;
+  }
+
+  function downloadImage() {
+    if (!generatedImageUrl) return;
+    const a = document.createElement('a');
+    a.href = generatedImageUrl;
+    a.download = `InTheSquad_${playerName}_${selectedTeam.name}.png`;
+    a.click();
+  }
+
+  function shareImage() {
+    if (navigator.share && generatedImageUrl) {
+      fetch(generatedImageUrl)
+        .then(r => r.blob())
+        .then(blob => {
+          const file = new File([blob], 'InTheSquad.png', { type: 'image/png' });
+          navigator.share({
+            title: 'InTheSquad',
+            text: `Je suis dans la sélection ${selectedTeam.name} ! 🔥 #InTheSquad #Mondial2026`,
+            files: [file]
+          });
+        })
+        .catch(() => downloadImage());
+    } else {
+      downloadImage();
+    }
+  }
+
+  function restart() {
+    photoFile = null;
+    photoBase64 = null;
+    selectedTeam = null;
+    selectedScene = null;
+    playerName = '';
+    generatedImageUrl = null;
+
+    document.getElementById('uploadContent').innerHTML = `
+      <div class="upload-icon">📸</div>
+      <div class="upload-title">Uploade ta photo</div>
+      <div class="upload-sub">Selfie ou portrait · JPG, PNG</div>
+    `;
+    document.getElementById('playerName').value = '';
+    document.getElementById('btn1').disabled = true;
+    document.getElementById('resultWrap').style.display = 'block';
+    document.querySelectorAll('.team-btn, .scene-btn').forEach(b => b.classList.remove('selected'));
+
+    showPanel('panel1');
+    setStep(1);
+  }
+
+  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+</body>
+</html>
