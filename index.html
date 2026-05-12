@@ -748,71 +748,170 @@
   }
 
   function showFallback(errMsg) {
-    // Create a canvas-based result with their photo
     const canvas = document.createElement('canvas');
-    canvas.width = 400;
-    canvas.height = 550;
+    canvas.width = 500;
+    canvas.height = 700;
     const ctx = canvas.getContext('2d');
 
     const img = new Image();
     img.onload = function() {
-      // Background gradient with team colors
-      const grad = ctx.createLinearGradient(0, 0, 0, 550);
-      grad.addColorStop(0, selectedTeam.color1 || '#001a8c');
-      grad.addColorStop(1, selectedTeam.color2 || '#8c001a');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 400, 550);
+      const W = 500, H = 700;
+      const c1 = selectedTeam.color1 || '#001a8c';
+      const c2 = selectedTeam.color2 || '#8c001a';
 
-      // Diagonal texture lines
-      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      // === BACKGROUND ===
+      const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+      bgGrad.addColorStop(0, c1);
+      bgGrad.addColorStop(0.6, c1);
+      bgGrad.addColorStop(1, c2);
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Stadium lights
+      [[80,80],[420,80],[80,550],[420,550]].forEach(([x,y]) => {
+        const lg = ctx.createRadialGradient(x,y,0,x,y,180);
+        lg.addColorStop(0,'rgba(255,255,255,0.12)');
+        lg.addColorStop(1,'rgba(255,255,255,0)');
+        ctx.fillStyle = lg;
+        ctx.fillRect(0,0,W,H);
+      });
+
+      // Diagonal lines texture
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
       ctx.lineWidth = 1;
-      for (let i = -550; i < 400; i += 20) {
-        ctx.beginPath();
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i + 550, 550);
-        ctx.stroke();
+      for (let i = -H; i < W+H; i += 25) {
+        ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i+H,H); ctx.stroke();
       }
 
-      // Photo circle
-      const cx = 200, cy = 200, r = 140;
+      // === GRASS ===
+      const grassY = H * 0.74;
+      const gGrad = ctx.createLinearGradient(0, grassY, 0, H);
+      gGrad.addColorStop(0, 'rgba(0,120,0,0.85)');
+      gGrad.addColorStop(1, 'rgba(0,60,0,0.95)');
+      ctx.fillStyle = gGrad;
+      ctx.fillRect(0, grassY, W, H - grassY);
+
+      // Grass stripes
+      for (let i = 0; i < 6; i++) {
+        if (i % 2 === 0) {
+          ctx.fillStyle = 'rgba(0,100,0,0.4)';
+          ctx.fillRect(0, grassY + i*((H-grassY)/6), W, (H-grassY)/6);
+        }
+      }
+
+      // Grass line
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, grassY); ctx.lineTo(W, grassY); ctx.stroke();
+
+      // === JERSEY ===
+      const jx = W/2, jy = H*0.6, jw = 200, jh = 160;
       ctx.save();
       ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.drawImage(img, cx - r, cy - r, r * 2, r * 2);
+      ctx.moveTo(jx-25, jy-jh/2);
+      ctx.lineTo(jx-70, jy-jh/2+18);
+      ctx.lineTo(jx-jw/2, jy-jh/2+8);
+      ctx.lineTo(jx-jw/2-28, jy-jh/2+55);
+      ctx.lineTo(jx-jw/2+5, jy-jh/2+75);
+      ctx.lineTo(jx-jw/2+8, jy+jh/2);
+      ctx.lineTo(jx+jw/2-8, jy+jh/2);
+      ctx.lineTo(jx+jw/2-5, jy-jh/2+75);
+      ctx.lineTo(jx+jw/2+28, jy-jh/2+55);
+      ctx.lineTo(jx+jw/2, jy-jh/2+8);
+      ctx.lineTo(jx+70, jy-jh/2+18);
+      ctx.lineTo(jx+25, jy-jh/2);
+      ctx.closePath();
+
+      const jGrad = ctx.createLinearGradient(jx-jw/2, jy, jx+jw/2, jy);
+      jGrad.addColorStop(0, c1);
+      jGrad.addColorStop(0.4, lightenColor(c1, 30));
+      jGrad.addColorStop(1, c2);
+      ctx.fillStyle = jGrad;
+      ctx.fill();
+
+      // Jersey shine
+      const shGrad = ctx.createLinearGradient(jx-40, jy-jh/2, jx+20, jy);
+      shGrad.addColorStop(0,'rgba(255,255,255,0.25)');
+      shGrad.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.fillStyle = shGrad; ctx.fill();
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+      ctx.lineWidth = 1.5; ctx.stroke();
+
+      // Number on jersey
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.font = 'bold 28px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('10', jx, jy + 20);
       ctx.restore();
 
-      // Circle border
-      ctx.strokeStyle = 'rgba(255,215,0,0.8)';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.stroke();
+      // === PHOTO CIRCLE ===
+      const px = W/2, py = H*0.36, pr = 115;
 
-      // Flag
-      ctx.font = '40px serif';
+      // Outer glow
+      const glowGrad = ctx.createRadialGradient(px,py,pr-10,px,py,pr+25);
+      glowGrad.addColorStop(0,'rgba(255,215,0,0.4)');
+      glowGrad.addColorStop(1,'rgba(255,215,0,0)');
+      ctx.fillStyle = glowGrad;
+      ctx.beginPath(); ctx.arc(px,py,pr+25,0,Math.PI*2); ctx.fill();
+
+      // Shadow
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.6)';
+      ctx.shadowBlur = 25;
+      ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2);
+      ctx.fillStyle = '#000'; ctx.fill();
+      ctx.restore();
+
+      // Photo
+      ctx.save();
+      ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2); ctx.clip();
+      const aspect = img.width / img.height;
+      let dw, dh, dx, dy;
+      if (aspect > 1) { dh=pr*2; dw=dh*aspect; dx=px-dw/2; dy=py-pr; }
+      else { dw=pr*2; dh=dw/aspect; dx=px-pr; dy=py-dh*0.28; }
+      ctx.drawImage(img, dx, dy, dw, dh);
+      ctx.restore();
+
+      // Gold border
+      ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2);
+      ctx.strokeStyle = '#FFD700'; ctx.lineWidth = 5; ctx.stroke();
+
+      ctx.beginPath(); ctx.arc(px,py,pr+9,0,Math.PI*2);
+      ctx.strokeStyle = 'rgba(255,215,0,0.25)'; ctx.lineWidth = 3; ctx.stroke();
+
+      // === FLAG top ===
+      ctx.font = '36px serif';
       ctx.textAlign = 'center';
-      ctx.fillText(selectedTeam.flag, 200, 380);
+      ctx.fillText(selectedTeam.flag, W/2, 42);
 
-      // Name
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 36px Arial';
+      // === NAME ===
+      ctx.shadowColor = 'rgba(0,0,0,0.8)';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#FFD700';
+      ctx.font = 'bold 34px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText(playerName, 200, 430);
+      ctx.fillText(playerName, W/2, H*0.84);
 
-      // Team
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.font = '14px Arial';
-      ctx.fillText(`SÉLECTION ${selectedTeam.name.toUpperCase()} · MONDIAL 2026`, 200, 460);
+      // Team line
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.font = '13px Arial';
+      ctx.shadowBlur = 4;
+      ctx.fillText(`SÉLECTION ${selectedTeam.name.toUpperCase()} · MONDIAL 2026`, W/2, H*0.895);
+
+      // Scene
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = '11px Arial';
+      ctx.fillText(selectedScene.name.toUpperCase(), W/2, H*0.935);
 
       // Watermark
       ctx.fillStyle = 'rgba(255,255,255,0.2)';
-      ctx.font = '12px Arial';
-      ctx.fillText('InTheSquad', 200, 530);
+      ctx.font = 'bold 12px Arial';
+      ctx.textAlign = 'right';
+      ctx.fillText('INTHESQUAD', W-12, 22);
 
       const dataUrl = canvas.toDataURL('image/png');
       generatedImageUrl = dataUrl;
-
       document.getElementById('resultImg').src = dataUrl;
       document.getElementById('resultName').textContent = playerName;
       document.getElementById('resultTeam').textContent = `${selectedTeam.flag} Sélection ${selectedTeam.name} · Mondial 2026`;
@@ -822,12 +921,21 @@
 
     img.onerror = function() {
       document.getElementById('errorBox').style.display = 'block';
-      document.getElementById('errorBox').textContent = 'Erreur lors de la génération. Réessaie avec une autre photo.';
+      document.getElementById('errorBox').textContent = 'Erreur. Réessaie avec une autre photo.';
       showPanel('panel4');
-      document.getElementById('resultWrap').style.display = 'none';
     };
 
     img.src = photoBase64;
+  }
+
+  function lightenColor(hex, amt) {
+    try {
+      const num = parseInt(hex.replace('#',''), 16);
+      const r = Math.min(255, (num >> 16) + amt);
+      const g = Math.min(255, ((num >> 8) & 255) + amt);
+      const b = Math.min(255, (num & 255) + amt);
+      return `rgb(${r},${g},${b})`;
+    } catch(e) { return hex; }
   }
 
   function downloadImage() {
